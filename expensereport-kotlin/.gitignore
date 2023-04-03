@@ -1,0 +1,16 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea
+*.iml
+
+# Make
+.User.mk
+
+# Maven
+target
+
+# Vim
+*.swp
