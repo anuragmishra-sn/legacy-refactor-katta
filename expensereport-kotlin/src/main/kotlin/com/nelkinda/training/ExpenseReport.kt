@@ -2,46 +2,43 @@ package com.nelkinda.training
 
 import java.util.Date
 
-enum class ExpenseType {
-    DINNER, BREAKFAST, CAR_RENTAL
+enum class ExpenseType(
+    val displayName: String,
+    val isMeal: Boolean,
+    private val limit: Int? = null,
+) {
+    DINNER("Dinner", true, 5000),
+    BREAKFAST("Breakfast", true, 1000),
+    CAR_RENTAL("Car Rental", false),;
+    fun isOverLimit(amount: Int) = limit != null && amount > limit
 }
 
-class Expense {
-    lateinit var type: ExpenseType
-    var amount: Int = 0
+data class Expense(
+    val type: ExpenseType,
+    val amount: Int,
+) {
+    val isMeal get() = type.isMeal
+    val name get() = type.displayName
+    fun isOverLimit() = type.isOverLimit(amount)
 }
 
 class ExpenseReport {
+    @Suppress("unused")
     fun printReport(expenses: List<Expense>) {
         printReport(expenses, Date())
     }
 
     fun printReport(expenses: List<Expense>, date: Date) {
-        var total = 0
-        var mealExpenses = 0
-
         println("Expenses $date")
-
         for (expense in expenses) {
-            if (expense.type == ExpenseType.DINNER || expense.type == ExpenseType.BREAKFAST) {
-                mealExpenses += expense.amount
-            }
-
-            var expenseName = ""
-            when (expense.type) {
-                ExpenseType.DINNER -> expenseName = "Dinner"
-                ExpenseType.BREAKFAST -> expenseName = "Breakfast"
-                ExpenseType.CAR_RENTAL -> expenseName = "Car Rental"
-            }
-
-            val mealOverExpensesMarker = if (expense.type == ExpenseType.DINNER && expense.amount > 5000 || expense.type == ExpenseType.BREAKFAST && expense.amount > 1000) "X" else " "
-
-            println(expenseName + "\t" + expense.amount + "\t" + mealOverExpensesMarker)
-
-            total += expense.amount
+            val mealOverExpensesMarker = if (expense.isOverLimit()) "X" else " "
+            println("${expense.name}\t${expense.amount}\t$mealOverExpensesMarker")
         }
 
-        println("Meal expenses: $mealExpenses")
-        println("Total expenses: $total")
+        println("Meal expenses: ${expenses.sumMeals()}")
+        println("Total expenses: ${expenses.sumTotal()}")
     }
+
+    private fun List<Expense>.sumMeals() = filter { it.isMeal }.sumOf { it.amount }
+    private fun List<Expense>.sumTotal() = sumOf { it.amount }
 }

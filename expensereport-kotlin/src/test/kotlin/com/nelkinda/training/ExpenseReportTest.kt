@@ -1,62 +1,38 @@
 package com.nelkinda.training
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.nelkinda.training.ExpenseType.BREAKFAST
+import com.nelkinda.training.ExpenseType.CAR_RENTAL
+import com.nelkinda.training.ExpenseType.DINNER
 import org.junit.jupiter.api.Test
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import java.util.Date
 
 class ExpenseReportTest {
-    @Test
-    fun `empty report`() {
-        val interceptedStdout = ByteArrayOutputStream()
-        System.setOut(PrintStream(interceptedStdout))
-        val expenseReport = ExpenseReport()
-        expenseReport.printReport(emptyList(), Date(123, 3, 4, 10, 2, 33))
-        val expected = """Expenses Tue Apr 04 10:02:33 IST 2023
-Meal expenses: 0
-Total expenses: 0
-"""
-        assertEquals(expected, interceptedStdout.toString())
-    }
+    private val expenseReport = ExpenseReport()
+
+    private val now = Date(123, 3, 4, 10, 2, 33)
 
     @Test
-    fun `single expense`() {
-        val interceptedStdout = ByteArrayOutputStream()
-        System.setOut(PrintStream(interceptedStdout))
-        val expenseReport = ExpenseReport()
-        val expense = Expense()
-        expense.type = ExpenseType.BREAKFAST
-        expense.amount = 100
-        val expenses = listOf(expense)
-        expenseReport.printReport(expenses, Date(123, 3, 4, 10, 2, 33))
+    fun `expenses over their limits are marked with an X`() {
+        val expenses = listOf(
+            Expense(BREAKFAST,  1000),
+            Expense(BREAKFAST,  1001),
+            Expense(DINNER,     5000),
+            Expense(DINNER,     5001),
+            Expense(CAR_RENTAL, 4   ),
+        )
         val expected = """Expenses Tue Apr 04 10:02:33 IST 2023
-Breakfast	100	 
-Meal expenses: 100
-Total expenses: 100
+Breakfast	1000	 
+Breakfast	1001	X
+Dinner	5000	 
+Dinner	5001	X
+Car Rental	4	 
+Meal expenses: 12002
+Total expenses: 12006
 """
-        assertEquals(expected, interceptedStdout.toString())
+        assertReport(expected) { expenseReport.printReport(expenses, now) }
     }
 
-    @Test
-    fun `two expenses`() {
-        val interceptedStdout = ByteArrayOutputStream()
-        System.setOut(PrintStream(interceptedStdout))
-        val expenseReport = ExpenseReport()
-        val expense1 = Expense()
-        expense1.type = ExpenseType.BREAKFAST
-        expense1.amount = 100
-        val expense2 = Expense()
-        expense2.type = ExpenseType.DINNER
-        expense2.amount = 200
-        val expenses = listOf(expense1, expense2)
-        expenseReport.printReport(expenses, Date(123, 3, 4, 10, 2, 33))
-        val expected = """Expenses Tue Apr 04 10:02:33 IST 2023
-Breakfast	100	 
-Dinner	200	 
-Meal expenses: 300
-Total expenses: 300
-"""
-        assertEquals(expected, interceptedStdout.toString())
+    fun assertReport(expected: String, block: () -> Unit) {
+        assertStdout(expected, block)
     }
 }
