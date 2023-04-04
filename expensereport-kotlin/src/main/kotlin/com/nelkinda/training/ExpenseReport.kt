@@ -13,10 +13,14 @@ class Expense {
 
 class ExpenseReport {
     fun printReport(expenses: List<Expense>) {
+        printReport(expenses, Date())
+    }
+
+    fun printReport(expenses: List<Expense>, date: Date) {
         var total = 0
         var mealExpenses = 0
 
-        println("Expenses ${Date()}")
+        println("Expenses $date")
 
         for (expense in expenses) {
             if (expense.type == ExpenseType.DINNER || expense.type == ExpenseType.BREAKFAST) {
