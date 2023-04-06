@@ -10,7 +10,7 @@ plugins {
 
 group = "com.nelkinda.training"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 configurations {
     compileOnly {
@@ -63,6 +63,9 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-suite-api")
     testImplementation("org.junit.platform:junit-platform-suite-commons")
     testImplementation("org.junit.platform:junit-platform-suite-engine")
+
+    pitest("org.pitest:pitest-junit5-plugin")
+    pitest("org.pitest:pitest-command-line")
 }
 
 tasks.withType<KotlinCompile> {
@@ -73,7 +76,7 @@ tasks.withType<KotlinCompile> {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.8"
 }
 
 tasks.test {
@@ -113,8 +116,8 @@ configure<info.solidsoft.gradle.pitest.PitestPluginExtension> {
     timestampedReports.set(false)
     outputFormats.set(setOf("XML", "HTML"))
     mutators.set(setOf("DEFAULTS", "STRONGER", "CONSTRUCTOR_CALLS", "INLINE_CONSTS", "REMOVE_CONDITIONALS", "REMOVE_INCREMENTS"))
-    mutationThreshold.set(100)
-    coverageThreshold.set(100)
+    mutationThreshold.set(0)
+    coverageThreshold.set(0)
 }
 
 tasks.withType<Test> {

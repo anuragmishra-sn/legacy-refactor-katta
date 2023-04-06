@@ -3,36 +3,37 @@ package com.nelkinda.training
 import com.nelkinda.training.ExpenseType.BREAKFAST
 import com.nelkinda.training.ExpenseType.CAR_RENTAL
 import com.nelkinda.training.ExpenseType.DINNER
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.util.Date
+import java.time.Clock
+import java.time.Instant.parse
 
 class ExpenseReportTest {
-    private val expenseReport = ExpenseReport()
-
-    private val now = Date(123, 3, 4, 10, 2, 33)
+    val clock = Clock.fixed(parse("2023-04-04T04:32:33.00Z"), java.time.ZoneId.of("Asia/Kolkata"))
+    private val expenseReport = ExpenseReport(clock)
 
     @Test
     fun `expenses over their limits are marked with an X`() {
         val expenses = listOf(
-            Expense(BREAKFAST,  1000),
-            Expense(BREAKFAST,  1001),
-            Expense(DINNER,     5000),
-            Expense(DINNER,     5001),
-            Expense(CAR_RENTAL, 4   ),
+            Expense(BREAKFAST,  1_000.INR),
+            Expense(BREAKFAST,  1_001.INR),
+            Expense(DINNER,     5_000.INR),
+            Expense(DINNER,     5_001.INR),
+            Expense(CAR_RENTAL,     4.INR),
         )
-        val expected = """Expenses Tue Apr 04 10:02:33 IST 2023
-Breakfast	1000	 
-Breakfast	1001	X
-Dinner	5000	 
-Dinner	5001	X
-Car Rental	4	 
+        val expected = """Expenses 2023-04-04T10:02:33
+Breakfast\t1000\t\s
+Breakfast\t1001\tX
+Dinner\t5000\t\s
+Dinner\t5001\tX
+Car Rental\t4\t\s
 Meal expenses: 12002
 Total expenses: 12006
-"""
-        assertReport(expected) { expenseReport.printReport(expenses, now) }
+""".translateEscapes()
+        assertReport(expected) { expenseReport.generateReport(expenses) }
     }
 
-    fun assertReport(expected: String, block: () -> Unit) {
-        assertStdout(expected, block)
+    fun assertReport(expected: String, block: () -> String) {
+        assertEquals(expected, block())
     }
 }
