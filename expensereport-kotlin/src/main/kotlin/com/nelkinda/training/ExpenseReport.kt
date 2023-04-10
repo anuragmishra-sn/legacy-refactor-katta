@@ -1,11 +1,8 @@
 package com.nelkinda.training
 
-import java.io.BufferedReader
 import java.time.Clock
-import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.Temporal
-import java.util.Date
 
 @JvmInline
 value class MonetaryAmount(val value: Int): Comparable<MonetaryAmount> {

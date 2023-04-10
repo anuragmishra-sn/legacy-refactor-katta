@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Clock
 import java.time.Instant.parse
+import java.time.ZoneId
 
 class ExpenseReportTest {
-    val clock = Clock.fixed(parse("2023-04-04T04:32:33.00Z"), java.time.ZoneId.of("Asia/Kolkata"))
+    val clock = Clock.fixed(parse("2023-04-04T04:32:33.00Z"), ZoneId.of("Asia/Kolkata"))
     private val expenseReport = ExpenseReport(clock)
 
     @Test
